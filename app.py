@@ -22,6 +22,7 @@ print(db.child("Hosts").get().val())
 @app.route("/get_matches", methods=["POST", "GET"])
 def get_matches():
 	search_data = request.get_json(force=True)
+	print(search_data)
 	possible_hosts = db.child("Hosts").get().val()
 	matches = []
 	for host in possible_hosts:
