@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, request
 from flask_cors import CORS
 
 
@@ -19,23 +19,36 @@ firebase = pyrebase.initialize_app(config)
 db = firebase.database()
 print(db.child("Hosts").get().val())
 
-@app.route("/get_matches")
-def get_matches(location, num_ppl, start_date, duration):
+@app.route("/get_matches", methods=["POST", "GET"])
+def get_matches():
+	search_data = request.get_json(force=True)
 	possible_hosts = db.child("Hosts").get().val()
 	matches = []
 	for host in possible_hosts:
 		# print(host, possible_hosts[host])
 		host_features = possible_hosts[host]
-		if(host_features.get("location")==location and host_features.get("num_ppl")>=num_ppl and host_features.get("duration")>=duration):
+		if(host_features.get("location")==search_data.get("location") and host_features.get("num_ppl")>=search_data.get("num_ppl")
+		 and (host_features.get("duration")>=search_data.get("duration") or search_data.get("duration")=="any") ):
 			date = host_features.get("start_date")
-			if(date["year"]==start_date["year"] and date["month"]==start_date["month"] and abs(date["day"] -start_date["day"])< 3 ):
+			start_date = search_data.get("start_date")
+			if(start_date=="any" or date["year"]==start_date["year"] and date["month"]==start_date["month"] and abs(date["day"] -start_date["day"])< 3 ):
 				matches.append(host_features)
 	print(matches)
-	# return jsonify(matches)
+	return jsonify(matches)
+
+@app.route("/enter_new_host", methods=["POST", "GET"])
+def enter_new_host():
+	host_data = request.get_json(force=True)
+	# possible_hosts = db.child("Hosts").get().val()
+	print(host_data)
+	db.child("Hosts").push(host_data)
+	
+	return "Done"
 
 # def hi
 
-get_matches("San Francisco",3,{"month": 9, "year":2019, "day":17},6)
+
+# get_matches("San Francisco",3,{"month": 9, "year":2019, "day":17},6)
 
 
 @app.route("/")
