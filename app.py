@@ -17,7 +17,7 @@ config = {
 
 firebase = pyrebase.initialize_app(config)
 db = firebase.database()
-print(db.child("Hosts").get().val())
+# print(db.child("Hosts").get().val())
 
 @app.route("/get_matches")
 def get_matches(location, num_ppl, start_date, duration):
@@ -26,9 +26,10 @@ def get_matches(location, num_ppl, start_date, duration):
 	for host in possible_hosts:
 		print(host, possible_hosts[host])
 		host_features = possible_hosts[host]
-		if(host_features.get("location")==location and host_features.get("num_ppl")>=num_ppl and host_features.get("duration")>=duration and
-			 abs(host_features["start_date"] - start_date)<5 ):
-			matches.append(host_features)
+		if(host_features.get("location")==location and host_features.get("num_ppl")>=num_ppl and host_features.get("duration")>=duration):
+			date = host_features.get("start_date")
+			if(date["year"]==start_date["year"] and date["month"]==start_date["month"] and abs(date["day"] -start_date["day"])< 3 ):
+				matches.append(host_features)
 	print(matches)
 	# return jsonify(matches)
 
