@@ -28,7 +28,8 @@ def get_matches():
 		# print(host, possible_hosts[host])
 		host_features = possible_hosts[host]
 		if(host_features.get("location")==search_data.get("location") and host_features.get("num_ppl")>=search_data.get("num_ppl")
-		 and (host_features.get("duration")>=search_data.get("duration") or search_data.get("duration")=="any") ):
+		 and (search_data.get("duration")=="any" or host_features.get("duration")>=search_data.get("duration")) 
+		 and host_features.get("type")==search_data.get("type")):
 			date = host_features.get("start_date")
 			start_date = search_data.get("start_date")
 			if(start_date=="any" or date["year"]==start_date["year"] and date["month"]==start_date["month"] and abs(date["day"] -start_date["day"])< 3 ):
